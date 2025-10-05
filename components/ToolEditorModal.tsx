@@ -66,6 +66,7 @@ export default function ToolEditorModal({
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
+            title="Enter the name for the function call"
           />
         </div>
         <div className="form-field">
@@ -75,6 +76,7 @@ export default function ToolEditorModal({
             value={description}
             onChange={e => setDescription(e.target.value)}
             rows={3}
+            title="Enter a description for what this function does"
           />
         </div>
         <div className="form-field">
@@ -85,6 +87,7 @@ export default function ToolEditorModal({
             onChange={e =>
               setScheduling(e.target.value as FunctionResponseScheduling)
             }
+            title="Choose when the model's audio response is spoken after a function call"
           >
             <option value={FunctionResponseScheduling.INTERRUPT}>
               Interrupt
@@ -106,14 +109,23 @@ export default function ToolEditorModal({
             className="json-editor"
             value={parametersStr}
             onChange={e => setParametersStr(e.target.value)}
+            title="Define the function's parameters using JSON Schema"
           />
           {jsonError && <p className="json-error">{jsonError}</p>}
         </div>
         <div className="modal-actions">
-          <button onClick={onClose} className="cancel-button">
+          <button
+            onClick={onClose}
+            className="cancel-button"
+            title="Discard changes and close the editor"
+          >
             Cancel
           </button>
-          <button onClick={handleSave} className="save-button">
+          <button
+            onClick={handleSave}
+            className="save-button"
+            title="Save the function call configuration"
+          >
             Save
           </button>
         </div>

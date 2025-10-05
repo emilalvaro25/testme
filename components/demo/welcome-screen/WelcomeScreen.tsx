@@ -19,20 +19,29 @@ const WelcomeScreen: React.FC = () => {
       <div className="home-content">
         <h2 className="home-title">What can I help with?</h2>
         <div className="action-chips">
-          <button className="chip">
+          <button className="chip" title="Start a session to create an image">
             <span className="icon">palette</span> Create image
           </button>
-          <button className="chip">
+          <button className="chip" title="Start a session to summarize text">
             <span className="icon">summarize</span> Summarize text
           </button>
-          <button className="chip">
+          <button
+            className="chip"
+            title="Start a session for writing assistance"
+          >
             <span className="icon">edit_square</span> Help me write
           </button>
-          <button className="chip">More</button>
+          <button className="chip" title="See more options">
+            More
+          </button>
         </div>
       </div>
       <div className="bottom-input-bar">
-        <button className="icon-button" aria-label="Upload image">
+        <button
+          className="icon-button"
+          aria-label="Upload image"
+          title="Upload an image"
+        >
           <span className="icon">add_photo_alternate</span>
         </button>
         <div className="input-text-container" aria-label="Ask anything">
@@ -42,10 +51,15 @@ const WelcomeScreen: React.FC = () => {
           className="icon-button"
           onClick={handleStartSession}
           aria-label="Start voice session"
+          title="Start voice session"
         >
           <span className="icon">mic</span>
         </button>
-        <button className="icon-button" aria-label="Ask with text">
+        <button
+          className="icon-button"
+          aria-label="Ask with text"
+          title="Ask with text"
+        >
           <span className="icon">graphic_eq</span>
         </button>
       </div>

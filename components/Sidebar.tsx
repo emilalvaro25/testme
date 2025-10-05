@@ -34,7 +34,11 @@ export default function Sidebar() {
       <aside className={c('sidebar', { open: isSidebarOpen })}>
         <div className="sidebar-header">
           <h3>Settings</h3>
-          <button onClick={toggleSidebar} className="close-button">
+          <button
+            onClick={toggleSidebar}
+            className="close-button"
+            title="Close settings panel"
+          >
             <span className="icon">close</span>
           </button>
         </div>
@@ -48,11 +52,16 @@ export default function Sidebar() {
                   onChange={e => setSystemPrompt(e.target.value)}
                   rows={10}
                   placeholder="Describe the role and personality of the AI..."
+                  title="Provide a system prompt to define the AI's role and personality"
                 />
               </label>
               <label>
                 Model
-                <select value={model} onChange={e => setModel(e.target.value)}>
+                <select
+                  value={model}
+                  onChange={e => setModel(e.target.value)}
+                  title="Select the AI model to use for the session"
+                >
                   {/* This is an experimental model name that should not be removed from the options. */}
                   {AVAILABLE_MODELS.map(m => (
                     <option key={m} value={m}>
@@ -63,7 +72,11 @@ export default function Sidebar() {
               </label>
               <label>
                 Voice
-                <select value={voice} onChange={e => setVoice(e.target.value)}>
+                <select
+                  value={voice}
+                  onChange={e => setVoice(e.target.value)}
+                  title="Select the AI's voice"
+                >
                   {AVAILABLE_VOICES.map(v => (
                     <option key={v} value={v}>
                       {v}
@@ -85,6 +98,9 @@ export default function Sidebar() {
                       checked={tool.isEnabled}
                       onChange={() => toggleTool(tool.name)}
                       disabled={connected}
+                      title={
+                        tool.isEnabled ? 'Disable this tool' : 'Enable this tool'
+                      }
                     />
                     <span className="checkbox-visual"></span>
                   </label>
@@ -99,6 +115,7 @@ export default function Sidebar() {
                       onClick={() => setEditingTool(tool)}
                       disabled={connected}
                       aria-label={`Edit ${tool.name}`}
+                      title={`Edit ${tool.name}`}
                     >
                       <span className="icon">edit</span>
                     </button>
@@ -106,6 +123,7 @@ export default function Sidebar() {
                       onClick={() => removeTool(tool.name)}
                       disabled={connected}
                       aria-label={`Delete ${tool.name}`}
+                      title={`Delete ${tool.name}`}
                     >
                       <span className="icon">delete</span>
                     </button>
@@ -117,6 +135,7 @@ export default function Sidebar() {
               onClick={addTool}
               className="add-tool-button"
               disabled={connected}
+              title="Add a new function call tool"
             >
               <span className="icon">add</span> Add function call
             </button>

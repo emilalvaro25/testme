@@ -22,7 +22,12 @@ const PopUp: React.FC<PopUpProps> = ({ onClose }) => {
           <li><span className="icon">save_as</span>Copy this sandbox to create your own version.</li>
           <li><span className="icon">auto_awesome</span>Use the Code Assistant to customize and test your creation.</li>
         </ol>
-        <button onClick={onClose}>Start Building</button>
+        <button
+          onClick={onClose}
+          title="Close this welcome message and start using the app"
+        >
+          Start Building
+        </button>
       </div>
     </div>
   );

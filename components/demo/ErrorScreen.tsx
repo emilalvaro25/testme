@@ -69,6 +69,7 @@ export default function ErrorScreen() {
           onClick={() => {
             setError(null);
           }}
+          title="Close this error message"
         >
           Close
         </button>
