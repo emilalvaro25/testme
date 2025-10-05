@@ -23,7 +23,6 @@ import { GenAILiveClient } from '../../lib/genai-live-client';
 import { LiveConnectConfig, LiveServerToolCall } from '@google/genai';
 import { AudioStreamer } from '../../lib/audio-streamer';
 import { audioContext } from '../../lib/utils';
-import VolMeterWorket from '../../lib/worklets/vol-meter';
 import { useLogStore, useSettings } from '@/lib/state';
 
 export type UseLiveApiResults = {
@@ -32,8 +31,6 @@ export type UseLiveApiResults = {
   connect: (config: LiveConnectConfig) => Promise<void>;
   disconnect: () => void;
   connected: boolean;
-
-  volume: number;
 };
 
 export function useLiveApi({
@@ -46,7 +43,6 @@ export function useLiveApi({
 
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
 
-  const [volume, setVolume] = useState(0);
   const [connected, setConnected] = useState(false);
 
   // register audio for streaming server -> speakers
@@ -54,16 +50,6 @@ export function useLiveApi({
     if (!audioStreamerRef.current) {
       audioContext({ id: 'audio-out' }).then((audioCtx: AudioContext) => {
         audioStreamerRef.current = new AudioStreamer(audioCtx);
-        audioStreamerRef.current
-          .addWorklet<any>('vumeter-out', VolMeterWorket, (ev: any) => {
-            setVolume(ev.data.volume);
-          })
-          .then(() => {
-            // Successfully added worklet
-          })
-          .catch(err => {
-            console.error('Error adding worklet:', err);
-          });
       });
     }
   }, [audioStreamerRef]);
@@ -167,6 +153,5 @@ export function useLiveApi({
     connect,
     connected,
     disconnect,
-    volume,
   };
 }
