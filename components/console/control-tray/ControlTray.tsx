@@ -31,13 +31,25 @@ function ControlTray({}: ControlTrayProps) {
   const [cameraOff, setCameraOff] = useState(true);
 
   const { client, connected, disconnect } = useLiveAPIContext();
-  const { setView, isMuted, setIsMuted } = useUI();
+  const { setView, isMuted, setIsMuted, setInputVolume } = useUI();
 
   useEffect(() => {
     if (!connected) {
       setIsMuted(false);
     }
   }, [connected, setIsMuted]);
+
+  useEffect(() => {
+    const onVolume = (volume: number) => {
+      setInputVolume(volume);
+    };
+
+    audioRecorder.on('volume', onVolume);
+
+    return () => {
+      audioRecorder.off('volume', onVolume);
+    };
+  }, [audioRecorder, setInputVolume]);
 
   useEffect(() => {
     const onData = (base64: string) => {

@@ -56,6 +56,8 @@ export const useUI = create<{
   setView: (view: 'home' | 'live') => void;
   isMuted: boolean;
   setIsMuted: (muted: boolean) => void;
+  inputVolume: number;
+  setInputVolume: (volume: number) => void;
 }>(set => ({
   isSidebarOpen: false,
   toggleSidebar: () => set(state => ({ isSidebarOpen: !state.isSidebarOpen })),
@@ -63,6 +65,8 @@ export const useUI = create<{
   setView: view => set({ view }),
   isMuted: false,
   setIsMuted: (muted: boolean) => set({ isMuted: muted }),
+  inputVolume: 0,
+  setInputVolume: volume => set({ inputVolume: volume }),
 }));
 
 /**

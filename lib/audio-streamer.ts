@@ -39,7 +39,13 @@ export class AudioStreamer {
   public source: AudioBufferSourceNode;
   private endOfQueueAudioSource: AudioBufferSourceNode | null = null;
 
+  // Progress tracking
+  private totalDuration = 0;
+  private playbackStartTime: number | null = null;
+  private progressAnimationFrame: number | null = null;
+
   public onComplete = () => {};
+  public onProgress = (progress: number) => {};
 
   constructor(public context: AudioContext) {
     this.gainNode = this.context.createGain();
@@ -113,11 +119,13 @@ export class AudioStreamer {
     while (processingBuffer.length >= this.bufferSize) {
       const buffer = processingBuffer.slice(0, this.bufferSize);
       this.audioQueue.push(buffer);
+      this.totalDuration += buffer.length / this.sampleRate;
       processingBuffer = processingBuffer.slice(this.bufferSize);
     }
     // Add the remaining buffer to the queue if it's not empty.
     if (processingBuffer.length > 0) {
       this.audioQueue.push(processingBuffer);
+      this.totalDuration += processingBuffer.length / this.sampleRate;
     }
     // Start playing if not already playing.
     if (!this.isPlaying) {
@@ -125,6 +133,7 @@ export class AudioStreamer {
       // Initialize scheduledTime only when we start playing
       this.scheduledTime = this.context.currentTime + this.initialBufferTime;
       this.scheduleNextBuffer();
+      this.startProgressTracking();
     }
   }
 
@@ -145,6 +154,9 @@ export class AudioStreamer {
       this.audioQueue.length > 0 &&
       this.scheduledTime < this.context.currentTime + SCHEDULE_AHEAD_TIME
     ) {
+      if (!this.playbackStartTime) {
+        this.playbackStartTime = this.scheduledTime;
+      }
       const audioData = this.audioQueue.shift()!;
       const audioBuffer = this.createAudioBuffer(audioData);
       const source = this.context.createBufferSource();
@@ -216,11 +228,50 @@ export class AudioStreamer {
     }
   }
 
+  private startProgressTracking() {
+    if (this.progressAnimationFrame) {
+      return;
+    }
+    const track = () => {
+      if (
+        !this.playbackStartTime ||
+        this.totalDuration === 0 ||
+        !this.isPlaying
+      ) {
+        this.onProgress(0);
+        this.stopProgressTracking();
+        return;
+      }
+
+      const elapsedTime = this.context.currentTime - this.playbackStartTime;
+      const progress = Math.min(elapsedTime / this.totalDuration, 1);
+      this.onProgress(progress);
+
+      if (progress >= 1) {
+        this.stopProgressTracking();
+      } else {
+        this.progressAnimationFrame = requestAnimationFrame(track);
+      }
+    };
+    this.progressAnimationFrame = requestAnimationFrame(track);
+  }
+
+  private stopProgressTracking() {
+    if (this.progressAnimationFrame) {
+      cancelAnimationFrame(this.progressAnimationFrame);
+      this.progressAnimationFrame = null;
+    }
+  }
+
   stop() {
     this.isPlaying = false;
     this.isStreamComplete = true;
     this.audioQueue = [];
     this.scheduledTime = this.context.currentTime;
+    this.stopProgressTracking();
+    this.onProgress(0);
+    this.totalDuration = 0;
+    this.playbackStartTime = null;
 
     if (this.checkInterval) {
       clearInterval(this.checkInterval);

@@ -12,9 +12,11 @@ import {
   useTools,
   ConversationTurn,
 } from '@/lib/state';
+import PlaybackProgress from './PlaybackProgress';
+import OrbVisualizer from './OrbVisualizer';
 
 export default function StreamingConsole() {
-  const { client, connect, connected } = useLiveAPIContext();
+  const { client, connect, connected, playbackProgress } = useLiveAPIContext();
   const { systemPrompt, voice } = useSettings();
   const { tools } = useTools();
 
@@ -138,7 +140,10 @@ export default function StreamingConsole() {
 
   return (
     <div className="live-viewport">
-      <div className="celestial-body moon"></div>
+      <PlaybackProgress progress={playbackProgress} />
+      <div className="celestial-body moon">
+        <OrbVisualizer />
+      </div>
       <div className="satellite">
         <span className="icon">satellite_alt</span>
       </div>

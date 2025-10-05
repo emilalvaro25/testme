@@ -24,6 +24,7 @@ import { LiveConnectConfig, LiveServerToolCall } from '@google/genai';
 import { AudioStreamer } from '../../lib/audio-streamer';
 import { audioContext } from '../../lib/utils';
 import { useLogStore, useSettings } from '@/lib/state';
+import VolMeterWorket from '../../lib/worklets/vol-meter';
 
 export type UseLiveApiResults = {
   client: GenAILiveClient;
@@ -31,6 +32,8 @@ export type UseLiveApiResults = {
   connect: (config: LiveConnectConfig) => Promise<void>;
   disconnect: () => void;
   connected: boolean;
+  playbackProgress: number;
+  volume: number;
 };
 
 export function useLiveApi({
@@ -44,12 +47,25 @@ export function useLiveApi({
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
 
   const [connected, setConnected] = useState(false);
+  const [playbackProgress, setPlaybackProgress] = useState(0);
+  const [volume, setVolume] = useState(0);
 
   // register audio for streaming server -> speakers
   useEffect(() => {
     if (!audioStreamerRef.current) {
-      audioContext({ id: 'audio-out' }).then((audioCtx: AudioContext) => {
-        audioStreamerRef.current = new AudioStreamer(audioCtx);
+      audioContext({ id: 'audio-out' }).then(async (audioCtx: AudioContext) => {
+        const streamer = new AudioStreamer(audioCtx);
+        streamer.onProgress = progress => {
+          setPlaybackProgress(progress);
+        };
+        await streamer.addWorklet(
+          'playback-vol-meter',
+          VolMeterWorket,
+          function (ev: MessageEvent) {
+            setVolume(ev.data.volume);
+          }
+        );
+        audioStreamerRef.current = streamer;
       });
     }
   }, [audioStreamerRef]);
@@ -153,5 +169,7 @@ export function useLiveApi({
     connect,
     connected,
     disconnect,
+    playbackProgress,
+    volume,
   };
 }
