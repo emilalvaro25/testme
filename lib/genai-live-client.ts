@@ -19,6 +19,8 @@ import { DEFAULT_LIVE_API_MODEL } from './constants';
 import { difference } from 'lodash';
 import { base64ToArrayBuffer } from './utils';
 
+export type LiveClientStatus = 'connected' | 'disconnected' | 'connecting';
+
 /**
  * Represents a single log entry in the system.
  * Used for tracking and displaying system events, messages, and errors.
@@ -81,7 +83,7 @@ export class GenAILiveClient {
   protected readonly client: GoogleGenAI;
   protected session?: Session;
 
-  private _status: 'connected' | 'disconnected' | 'connecting' = 'disconnected';
+  private _status: LiveClientStatus = 'disconnected';
   public get status() {
     return this._status;
   }

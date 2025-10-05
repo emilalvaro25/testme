@@ -19,7 +19,10 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GenAILiveClient } from '../../lib/genai-live-client';
+import {
+  GenAILiveClient,
+  LiveClientStatus,
+} from '../../lib/genai-live-client';
 import { LiveConnectConfig, LiveServerToolCall } from '@google/genai';
 import { AudioStreamer } from '../../lib/audio-streamer';
 import { audioContext } from '../../lib/utils';
@@ -28,7 +31,7 @@ import VolMeterWorket from '../../lib/worklets/vol-meter';
 
 export type UseLiveApiResults = {
   client: GenAILiveClient;
-
+  status: LiveClientStatus;
   connect: (config: LiveConnectConfig) => Promise<void>;
   disconnect: () => void;
   connected: boolean;
@@ -42,11 +45,15 @@ export function useLiveApi({
   apiKey: string;
 }): UseLiveApiResults {
   const { model } = useSettings();
-  const client = useMemo(() => new GenAILiveClient(apiKey, model), [apiKey, model]);
+  const client = useMemo(
+    () => new GenAILiveClient(apiKey, model),
+    [apiKey, model],
+  );
 
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
 
   const [connected, setConnected] = useState(false);
+  const [status, setStatus] = useState<LiveClientStatus>('disconnected');
   const [playbackProgress, setPlaybackProgress] = useState(0);
   const [volume, setVolume] = useState(0);
 
@@ -63,7 +70,7 @@ export function useLiveApi({
           VolMeterWorket,
           function (ev: MessageEvent) {
             setVolume(ev.data.volume);
-          }
+          },
         );
         audioStreamerRef.current = streamer;
       });
@@ -73,10 +80,12 @@ export function useLiveApi({
   useEffect(() => {
     const onOpen = () => {
       setConnected(true);
+      setStatus('connected');
     };
 
     const onClose = () => {
       setConnected(false);
+      setStatus('disconnected');
     };
 
     const stopAudioStreamer = () => {
@@ -148,24 +157,28 @@ export function useLiveApi({
     };
   }, [client]);
 
-  const connect = useCallback(async (config: LiveConnectConfig) => {
-    if (!config || Object.keys(config).length === 0) {
-      console.error(
-        'Connect called with an empty config.'
-      );
-      return;
-    }
-    client.disconnect();
-    await client.connect(config);
-  }, [client]);
+  const connect = useCallback(
+    async (config: LiveConnectConfig) => {
+      if (!config || Object.keys(config).length === 0) {
+        console.error('Connect called with an empty config.');
+        return;
+      }
+      client.disconnect();
+      setStatus('connecting');
+      await client.connect(config);
+    },
+    [client],
+  );
 
   const disconnect = useCallback(async () => {
     client.disconnect();
     setConnected(false);
+    setStatus('disconnected');
   }, [setConnected, client]);
 
   return {
     client,
+    status,
     connect,
     connected,
     disconnect,

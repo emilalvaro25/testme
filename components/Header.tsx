@@ -3,14 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import { useUI } from '@/lib/state';
+import { useLiveAPIContext } from '@/contexts/LiveAPIContext';
+import cn from 'classnames';
 
 export default function Header() {
   const { toggleSidebar, view } = useUI();
+  const { status } = useLiveAPIContext();
 
   if (view === 'live') {
     return (
       <header className="app-header">
         <div className="header-left">
+          <div
+            className={cn('connection-status', status)}
+            title={`Status: ${status}`}
+          />
           <h2 className="session-name">Josefa</h2>
         </div>
         <div className="header-right">
@@ -52,7 +59,13 @@ export default function Header() {
         >
           <span className="icon">menu</span>
         </button>
-        <h1 className="app-title">Kithai AI</h1>
+        <div className="app-title-container">
+          <h1 className="app-title">Kithai AI</h1>
+          <div
+            className={cn('connection-status', status)}
+            title={`Status: ${status}`}
+          />
+        </div>
       </div>
       <div className="header-right">
         <button
