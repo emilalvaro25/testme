@@ -62,15 +62,15 @@
   transition-delay: 160ms;
 }
 
-/* --- Playback Visualizer - AI Speaking --- */
+/* --- Playback Visualizer - AI Speaking (Cloudy Nebula) --- */
 .playback-visualizer {
   position: absolute;
   inset: 0;
   overflow: hidden;
   border-radius: 50%;
   /* Overall intensity scales with playback volume */
-  transform: scale(calc(0.8 + var(--playback-volume) * 0.4));
-  opacity: calc(var(--playback-volume) * 1.1); /* Slightly brighter */
+  transform: scale(calc(0.9 + var(--playback-volume) * 0.2));
+  opacity: calc(var(--playback-volume) * 1.2); /* Slightly brighter */
   transition:
     transform 400ms ease-out,
     opacity 400ms ease-out;
@@ -79,19 +79,17 @@
   transform-style: preserve-3d;
 }
 
-/* Enhanced keyframes for more fluid, less predictable movement */
-@keyframes swirl3d {
-  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.2); opacity: 0.8; }
-  33% { transform: rotateX(120deg) rotateY(45deg) rotateZ(180deg) scale(1.6); opacity: 1; }
-  66% { transform: rotateX(240deg) rotateY(270deg) rotateZ(270deg) scale(1.1); opacity: 0.7; }
-  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg) scale(1.2); opacity: 0.8; }
+/* Slower, more majestic keyframes for nebula effect */
+@keyframes nebula-swirl {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.2); }
+  50% { transform: rotateX(180deg) rotateY(45deg) rotateZ(90deg) scale(1.5); }
+  100% { transform: rotateX(360deg) rotateY(0deg) rotateZ(360deg) scale(1.2); }
 }
 
-@keyframes swirl-reverse3d {
-  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.4); opacity: 0.7; }
-  33% { transform: rotateX(-45deg) rotateY(-180deg) rotateZ(-90deg) scale(1.0); opacity: 1; }
-  66% { transform: rotateX(-270deg) rotateY(-270deg) rotateZ(-180deg) scale(1.5); opacity: 0.8; }
-  100% { transform: rotateX(-360deg) rotateY(-360deg) rotateZ(-360deg) scale(1.4); opacity: 0.7; }
+@keyframes nebula-swirl-reverse {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.4); }
+  50% { transform: rotateX(-90deg) rotateY(-180deg) rotateZ(-45deg) scale(1.1); }
+  100% { transform: rotateX(-360deg) rotateY(-360deg) rotateZ(-360deg) scale(1.4); }
 }
 
 .aurora-layer {
@@ -100,27 +98,28 @@
   height: 200%;
   top: -50%;
   left: -50%;
-  mix-blend-mode: color-dodge; /* A more ethereal blend mode */
+  mix-blend-mode: soft-light; /* Softer blend mode for cloudy effect */
+  filter: blur(40px); /* Heavy blur for soft, gaseous texture */
 }
 
-/* More complex, nebula-like gradients for a richer cosmic feel */
+/* Lime-green nebula color palette */
 .aurora-layer.aurora1 {
   background:
-    radial-gradient(ellipse at 40% 60%, hsla(275, 100%, 70%, 0.7) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 30%, hsla(220, 100%, 70%, 0.5) 0%, transparent 50%);
-  animation: swirl3d 12s ease-in-out infinite alternate;
+    radial-gradient(ellipse at 40% 60%, hsla(120, 100%, 70%, 0.7) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 30%, hsla(160, 80%, 60%, 0.5) 0%, transparent 40%);
+  animation: nebula-swirl 20s ease-in-out infinite alternate;
 }
 
 .aurora-layer.aurora2 {
   background:
-    radial-gradient(ellipse at 60% 40%, hsla(210, 100%, 80%, 0.6) 0%, transparent 70%),
-    radial-gradient(ellipse at 30% 80%, hsla(320, 100%, 75%, 0.4) 0%, transparent 60%);
-  animation: swirl-reverse3d 15s ease-in-out infinite alternate;
+    radial-gradient(ellipse at 60% 40%, hsla(100, 100%, 80%, 0.6) 0%, transparent 60%),
+    linear-gradient(135deg, hsla(130, 90%, 50%, 0.4) 0%, transparent 70%);
+  animation: nebula-swirl-reverse 25s ease-in-out infinite alternate;
 }
 
 .aurora-layer.aurora3 {
   background:
-    radial-gradient(ellipse at 50% 50%, hsla(330, 100%, 75%, 0.5) 0%, transparent 60%),
-    radial-gradient(ellipse at 20% 20%, hsla(260, 100%, 70%, 0.6) 0%, transparent 55%);
-  animation: swirl3d 18s ease-in-out infinite reverse alternate;
+    radial-gradient(ellipse at 50% 50%, hsla(90, 100%, 75%, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 20%, hsla(140, 100%, 60%, 0.6) 0%, transparent 45%);
+  animation: nebula-swirl 30s ease-in-out infinite reverse alternate;
 }
