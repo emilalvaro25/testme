@@ -66,8 +66,9 @@ export default function OrbVisualizer() {
         <div className="input-ring" />
       </div>
       <div className="playback-visualizer">
-        <div className="wave" />
-        <div className="wave" />
+        <div className="aurora-layer aurora1" />
+        <div className="aurora-layer aurora2" />
+        <div className="aurora-layer aurora3" />
       </div>
     </div>
   );

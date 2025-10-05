@@ -6,14 +6,26 @@
   height: 100%;
   border-radius: 50%;
   pointer-events: none;
+}
+
+/* --- Input Visualizer - User Speaking --- */
+.input-visualizer {
+  position: absolute;
+  inset: 0;
   mix-blend-mode: screen;
   opacity: 0.9;
 }
 
-/* Input Visualizer - Pulsing Rings */
-.input-visualizer {
+/* Add a soft inner glow that responds to user voice */
+.input-visualizer::before {
+  content: '';
   position: absolute;
   inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 40px 10px rgba(0, 220, 255, 0.7);
+  opacity: var(--input-volume);
+  transform: scale(calc(1 + var(--input-volume) * 0.05));
+  transition: all 300ms ease-out;
 }
 
 .input-ring {
@@ -23,59 +35,94 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 1.5px solid rgba(138, 180, 248, 0.7); /* --accent-blue with opacity */
-  transform: translate(-50%, -50%) scale(var(--input-volume));
-  opacity: calc(1 - var(--input-volume));
+  border: 1.5px solid rgba(0, 220, 255, 0.8); /* Cyan color */
+  transform: translate(-50%, -50%) scale(calc(0.95 + var(--input-volume) * 0.25));
+  opacity: calc(var(--input-volume) * var(--input-volume) * 1.2);
+}
+
+/* Staggered and more organic transitions */
+.input-ring:nth-child(1) {
   transition:
-    transform 150ms ease-out,
-    opacity 300ms ease-out;
+    transform 300ms cubic-bezier(0.2, 1, 0.3, 1),
+    opacity 500ms ease-out;
 }
 
 .input-ring:nth-child(2) {
-  transition-delay: 75ms;
+  transition:
+    transform 350ms cubic-bezier(0.2, 1, 0.3, 1),
+    opacity 500ms ease-out;
+  transition-delay: 80ms;
 }
 
 .input-ring:nth-child(3) {
-  transition-delay: 150ms;
+  transition:
+    transform 400ms cubic-bezier(0.2, 1, 0.3, 1),
+    opacity 500ms ease-out;
+  transition-delay: 160ms;
 }
 
-/* Playback Visualizer - Wavy/Particle effect */
+/* --- Playback Visualizer - AI Speaking --- */
 .playback-visualizer {
   position: absolute;
   inset: 0;
   overflow: hidden;
   border-radius: 50%;
-  transform: scale(calc(0.5 + var(--playback-volume)));
-  opacity: calc(var(--playback-volume) * 0.5 + 0.1);
+  /* Overall intensity scales with playback volume */
+  transform: scale(calc(0.8 + var(--playback-volume) * 0.4));
+  opacity: calc(var(--playback-volume) * 1.1); /* Slightly brighter */
   transition:
-    transform 200ms ease-out,
-    opacity 200ms ease-out;
+    transform 400ms ease-out,
+    opacity 400ms ease-out;
+  /* Add perspective and preserve 3D for children */
+  perspective: 800px;
+  transform-style: preserve-3d;
 }
 
-.wave {
+@keyframes swirl3d {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.2); }
+  50% { transform: rotateX(180deg) rotateY(90deg) rotateZ(180deg) scale(1.5); }
+  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg) scale(1.2); }
+}
+
+@keyframes swirl-reverse3d {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.4); }
+  50% { transform: rotateX(-90deg) rotateY(-180deg) rotateZ(-180deg) scale(1.1); }
+  100% { transform: rotateX(-360deg) rotateY(-360deg) rotateZ(-360deg) scale(1.4); }
+}
+
+.aurora-layer {
   position: absolute;
   width: 200%;
   height: 200%;
   top: -50%;
   left: -50%;
+  opacity: 0.6;
+  mix-blend-mode: color-dodge; /* A more ethereal blend mode */
+}
+
+.aurora-layer.aurora1 {
   background: radial-gradient(
-    circle at center,
-    rgba(220, 235, 255, 0.2),
-    transparent 50%
+    ellipse at 40% 60%,
+    rgba(200, 100, 255, 0.8) 0%,
+    transparent 70%
   );
-  animation: rotate-wave 15s linear infinite;
+  animation: swirl3d 12s ease-in-out infinite;
 }
 
-.wave:nth-child(2) {
-  animation-duration: 20s;
-  animation-direction: reverse;
+.aurora-layer.aurora2 {
+  background: radial-gradient(
+    ellipse at 60% 40%,
+    rgba(100, 150, 255, 0.7) 0%,
+    transparent 70%
+  );
+  animation: swirl-reverse3d 15s ease-in-out infinite;
 }
 
-@keyframes rotate-wave {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.aurora-layer.aurora3 {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(255, 120, 200, 0.6) 0%,
+    transparent 60%
+  );
+  animation: swirl3d 18s ease-in-out infinite reverse;
 }
