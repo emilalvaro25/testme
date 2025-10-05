@@ -271,11 +271,19 @@ button:focus-visible { outline: 2px solid var(--accent-blue); }
   height: clamp(200px, 60vmin, 400px);
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #f4f1e9, #a3a197 60%, #5a5853 100%);
+  position: relative;
+  overflow: hidden;
+  
+  /* Dynamic glow based on playback volume */
+  --glow-intensity: calc(var(--playback-volume, 0) * 0.6 + 0.2);
+  --glow-spread: calc(var(--playback-volume, 0) * 20px + 10px);
+  --glow-blur: calc(var(--playback-volume, 0) * 40px + 40px);
+  
   box-shadow:
-    0 0 40px 10px rgba(173, 216, 230, 0.2), /* Outer glow */
+    0 0 var(--glow-blur) var(--glow-spread) rgba(173, 216, 230, var(--glow-intensity)), /* Dynamic outer glow */
     inset 10px -10px 20px rgba(0,0,0,0.3),  /* Inner shadow for dimension */
     inset -5px 5px 15px rgba(255,255,255,0.1); /* Inner highlight */
-  position: relative;
+  transition: box-shadow 150ms linear; /* Smooth transition for the glow */
 }
 .celestial-body.moon::before { /* Craters */
   content: '';
@@ -321,6 +329,8 @@ button:focus-visible { outline: 2px solid var(--accent-blue); }
   display: grid;
   place-items: center;
   transition: background-color 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 .control-button:hover {
   background-color: var(--gray-800);

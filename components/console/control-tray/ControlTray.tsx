@@ -28,17 +28,26 @@ export type ControlTrayProps = {};
 
 function ControlTray({}: ControlTrayProps) {
   const [audioRecorder] = useState(() => new AudioRecorder());
-  const [muted, setMuted] = useState(false);
   const [cameraOff, setCameraOff] = useState(true);
 
-  const { client, connected, connect, disconnect } = useLiveAPIContext();
-  const { setView } = useUI();
+  const { client, connected, disconnect } = useLiveAPIContext();
+  const { setView, isMuted, setIsMuted, setInputVolume } = useUI();
 
   useEffect(() => {
     if (!connected) {
-      setMuted(false);
+      setIsMuted(false);
     }
-  }, [connected]);
+  }, [connected, setIsMuted]);
+
+  useEffect(() => {
+    const handleVolume = (volume: number) => {
+      setInputVolume(volume);
+    };
+    audioRecorder.on('volume', handleVolume);
+    return () => {
+      audioRecorder.off('volume', handleVolume);
+    };
+  }, [audioRecorder, setInputVolume]);
 
   useEffect(() => {
     const onData = (base64: string) => {
@@ -49,7 +58,7 @@ function ControlTray({}: ControlTrayProps) {
         },
       ]);
     };
-    if (connected && !muted && audioRecorder) {
+    if (connected && !isMuted && audioRecorder) {
       audioRecorder.on('data', onData);
       audioRecorder.start();
     } else {
@@ -58,11 +67,11 @@ function ControlTray({}: ControlTrayProps) {
     return () => {
       audioRecorder.off('data', onData);
     };
-  }, [connected, client, muted, audioRecorder]);
+  }, [connected, client, isMuted, audioRecorder]);
 
   const handleMicClick = () => {
     if (connected) {
-      setMuted(!muted);
+      setIsMuted(!isMuted);
     } else {
       // In this new UI, connect() is called when transitioning to the live view.
       // This button's primary role is now muting.
@@ -75,10 +84,12 @@ function ControlTray({}: ControlTrayProps) {
   };
 
   const micButtonTitle = connected
-    ? muted
+    ? isMuted
       ? 'Unmute microphone'
       : 'Mute microphone'
     : 'Microphone';
+
+  const isMicActive = connected && !isMuted;
 
   return (
     <section className="live-control-tray">
@@ -93,12 +104,12 @@ function ControlTray({}: ControlTrayProps) {
         </span>
       </button>
       <button
-        className={cn('control-button', { active: connected && !muted })}
+        className={cn('control-button', { active: isMicActive })}
         onClick={handleMicClick}
         title={micButtonTitle}
         aria-label={micButtonTitle}
       >
-        <span className="icon filled">{muted ? 'mic_off' : 'mic'}</span>
+        <span className="icon filled">{isMuted ? 'mic_off' : 'mic'}</span>
       </button>
       <button
         className="control-button"
